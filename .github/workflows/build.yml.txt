@@ -1,0 +1,36 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install PyQt6 pyinstaller
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller --onedir --windowed --name ArCode main_window.py
+
+      - name: Copy compiler folder
+        run: |
+          xcopy /E /I compiler dist\ArCode\compiler
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ArCode-Windows
+          path: dist/ArCode/
